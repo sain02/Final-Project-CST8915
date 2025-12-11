@@ -5,14 +5,14 @@
 ### Student Number- 041168394
 A fully containerized, Kubernetes-orchestrated microservices system deployed on Azure AKS, with CI/CD pipelines and a production-ready architecture.
 
-📌 **Architecture Diagram**
+**Architecture Diagram**
 
 ![alt text](<Screenshot 2025-12-10 201746.png>)
 
 
 ---
 
-## 🧱 Project Overview
+## Project Overview
 
 This project implements a cloud-native microservices-based Best Buy Online Store using five independent services and a MongoDB stateful backend.
 Each microservice runs in a Docker container and is deployed to Azure Kubernetes Service (AKS) using Kubernetes manifests.
@@ -30,7 +30,7 @@ The project also includes GitHub Actions-based CI/CD pipelines.
 
 ---
 
-## 🏗️ Microservices in the System
+##  Microservices in the System
 
 | Microservice       | Description                                      |
 |--------------------|--------------------------------------------------|
