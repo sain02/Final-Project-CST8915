@@ -1,0 +1,342 @@
+###############################################
+# MONGODB STATEFULSET
+###############################################
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:4.2
+          ports:
+            - containerPort: 27017
+          resources:
+            requests:
+              cpu: 5m
+              memory: 75Mi
+            limits:
+              cpu: 25m
+              memory: 1024Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  ports:
+    - port: 27017
+  selector:
+    app: mongodb
+
+###############################################
+# RABBITMQ STATEFULSET
+###############################################
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+spec:
+  serviceName: rabbitmq
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: "username"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "password"
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - port: 5672
+      targetPort: 5672
+    - port: 15672
+      targetPort: 15672
+
+###############################################
+# ORDER SERVICE
+###############################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: saizalsaini02/order-service:v1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: ORDER_QUEUE_HOSTNAME
+              value: rabbitmq
+            - name: ORDER_QUEUE_PORT
+              value: "5672"
+            - name: ORDER_QUEUE_USERNAME
+              value: "username"
+            - name: ORDER_QUEUE_PASSWORD
+              value: "password"
+            - name: ORDER_QUEUE_NAME
+              value: "orders"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: order-service
+  ports:
+    - port: 3000
+      targetPort: 3000
+
+###############################################
+# MAKELINE SERVICE
+###############################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: makeline-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: makeline-service
+  template:
+    metadata:
+      labels:
+        app: makeline-service
+    spec:
+      containers:
+        - name: makeline-service
+          image: saizalsaini02/makeline-service:v1
+          ports:
+            - containerPort: 3001
+          env:
+            - name: ORDER_QUEUE_URI
+              value: "amqp://rabbitmq:5672"
+            - name: ORDER_QUEUE_USERNAME
+              value: "username"
+            - name: ORDER_QUEUE_PASSWORD
+              value: "password"
+            - name: ORDER_QUEUE_NAME
+              value: "orders"
+            - name: ORDER_DB_URI
+              value: "mongodb://mongodb:27017"
+            - name: ORDER_DB_NAME
+              value: "orderdb"
+            - name: ORDER_DB_COLLECTION_NAME
+              value: "orders"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: makeline-service
+spec:
+  selector:
+    app: makeline-service
+  ports:
+    - port: 3001
+      targetPort: 3001
+
+###############################################
+# PRODUCT SERVICE
+###############################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      containers:
+        - name: product-service
+          image: saizalsaini02/product-service:v1
+          ports:
+            - containerPort: 3002
+          env:
+            - name: AI_SERVICE_URL
+              value: "http://ai-service:5001/"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+spec:
+  selector:
+    app: product-service
+  ports:
+    - port: 3002
+      targetPort: 3002
+
+###############################################
+# STORE FRONT (EXTERNAL)
+###############################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store-front
+  template:
+    metadata:
+      labels:
+        app: store-front
+    spec:
+      containers:
+        - name: store-front
+          image: saizalsaini02/store-front:v1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: VUE_APP_ORDER_SERVICE_URL
+              value: "http://order-service:3000/"
+            - name: VUE_APP_PRODUCT_SERVICE_URL
+              value: "http://product-service:3002/"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: store-front
+spec:
+  type: LoadBalancer
+  selector:
+    app: store-front
+  ports:
+    - port: 80
+      targetPort: 8080
+
+###############################################
+# STORE ADMIN (EXTERNAL)
+###############################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store-admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store-admin
+  template:
+    metadata:
+      labels:
+        app: store-admin
+    spec:
+      containers:
+        - name: store-admin
+          image: saizalsaini02/store-admin:v1
+          ports:
+            - containerPort: 8081
+          env:
+            - name: VUE_APP_PRODUCT_SERVICE_URL
+              value: "http://product-service:3002/"
+            - name: VUE_APP_MAKELINE_SERVICE_URL
+              value: "http://makeline-service:3001/"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: store-admin
+spec:
+  type: LoadBalancer
+  selector:
+    app: store-admin
+  ports:
+    - port: 80
+      targetPort: 8081
+
+###############################################
+# AI SERVICE (PUBLIC OPENAI)
+###############################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-service
+  template:
+    metadata:
+      labels:
+        app: ai-service
+    spec:
+      containers:
+        - name: ai-service
+          image: ramymohamed/ai-service-l8:latest
+          ports:
+            - containerPort: 5001
+          env:
+            - name: USE_AZURE_OPENAI
+              value: "False"
+            - name: OPENAI_GPT_API_KEY
+              value: "dummy"
+            - name: OPENAI_DALLE_API_KEY
+              value: "dummy"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-service
+spec:
+  selector:
+    app: ai-service
+  ports:
+    - port: 5001
+      targetPort: 5001
