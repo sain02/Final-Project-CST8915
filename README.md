@@ -61,8 +61,32 @@ docker build -t saizalsaini02/product-service:v1 .
 docker push saizalsaini02/product-service:v1
 ```
 
+### Containerize the Microservices
+Each microservice (Store-Front, Store-Admin, Product-Service, Order-Service, Makeline-Service) is packaged into a Docker image and tagged with a version.
 
----
+### Push Images to Docker Hub
+The built Docker images are pushed to Docker Hub to make them accessible to the Kubernetes cluster.
+
+### Create Azure Kubernetes Service (AKS) Cluster
+An AKS cluster is provisioned on Microsoft Azure to run all microservices and database components.
+
+### Configure kubectl Access
+Credentials are retrieved using az aks get-credentials, enabling local deployment and management of workloads on AKS.
+
+### Deploy MongoDB and RabbitMQ
+StatefulSet and Service manifests are applied to deploy MongoDB and RabbitMQ inside the cluster.
+
+### Deploy All Application Microservices
+Kubernetes Deployment and Service YAML files for each microservice are applied using:
+kubectl apply -f <filename>
+
+Expose Frontend Services Externally
+Store-Front and Store-Admin use type: LoadBalancer to generate public IPs for user access.
+
+### Verify Deployment Status
+kubectl get pods and kubectl get svc are used to confirm running pods and retrieve external IP addresses.
+
+
 
 ##  CI/CD Pipeline (GitHub Actions)
 
@@ -136,3 +160,7 @@ This project demonstrates:
 ✔ Realistic retail-store workflow (Best Buy)  
 
 This completes the required course project with a fully functional, scalable, and production-style system.
+
+----
+----
+### THANKS
