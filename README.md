@@ -143,12 +143,12 @@ jobs:
 
 | Component         | GitHub Repository | Docker Hub Image                          |
 |-------------------|-------------------|-------------------------------------------|
-| Store-Front       | (add link)        | saizalsaini02/store-front:v1             |
-| Store-Admin       | (add link)        | saizalsaini02/store-admin:v1             |
-| Product-Service   | (add link)        | saizalsaini02/product-service:v1         |
-| Order-Service     | (add link)        | saizalsaini02/order-service:v1           |
-| Makeline-Service  | (add link)        | saizalsaini02/makeline-service:v1        |
-| MongoDB StatefulSet| (add link)       | (N/A)                                    |
+| Store-Front       | https://github.com/sain02/store-front-L9        | saizalsaini02/store-front:v1             |
+| Store-Admin       | https://github.com/sain02/store-admin-L9        | saizalsaini02/store-admin:v1             |
+| Product-Service   | https://github.com/sain02/product-service-L9       | saizalsaini02/product-service:v1         |
+| Order-Service     | https://github.com/sain02/order-service-L9        | saizalsaini02/order-service:v1           |
+| Makeline-Service  | https://github.com/sain02/makeline-service-L9       | saizalsaini02/makeline-service:v1        |
+
 
 ---
 
