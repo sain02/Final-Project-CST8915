@@ -61,43 +61,6 @@ docker build -t saizalsaini02/product-service:v1 .
 docker push saizalsaini02/product-service:v1
 ```
 
-### Deploy MongoDB StatefulSet
-```bash
-kubectl apply -f Deployment Files/mongodb.yaml
-```
-
-### Deploy Secrets & ConfigMap
-```bash
-kubectl apply -f Deployment Files/config-secret.yaml
-kubectl apply -f Deployment Files/configmap.yaml
-```
-
-### Deploy Microservices
-```bash
-kubectl apply -f Deployment Files/product-service.yaml
-kubectl apply -f Deployment Files/order-service.yaml
-kubectl apply -f Deployment Files/makeline-service.yaml
-kubectl apply -f Deployment Files/store-front.yaml
-kubectl apply -f Deployment Files/store-admin.yaml
-```
-
-###  Verify Deployment
-```bash
-kubectl get pods
-kubectl get svc
-```
-
-Look for store-front LoadBalancer external IP:
-
-```
-store-front   LoadBalancer   <EXTERNAL-IP>   80:xxxx/TCP
-```
-
-Open in browser:
-
-```
-http://<EXTERNAL-IP>
-```
 
 ---
 
@@ -143,11 +106,11 @@ jobs:
 
 | Component         | GitHub Repository | Docker Hub Image                          |
 |-------------------|-------------------|-------------------------------------------|
-| Store-Front       | https://github.com/sain02/store-front-L9        | saizalsaini02/store-front:v1             |
-| Store-Admin       | https://github.com/sain02/store-admin-L9        | saizalsaini02/store-admin:v1             |
-| Product-Service   | https://github.com/sain02/product-service-L9       | saizalsaini02/product-service:v1         |
-| Order-Service     | https://github.com/sain02/order-service-L9        | saizalsaini02/order-service:v1           |
-| Makeline-Service  | https://github.com/sain02/makeline-service-L9       | saizalsaini02/makeline-service:v1        |
+| Store-Front       | https://github.com/sain02/store-front-L9        | https://hub.docker.com/r/saizalsaini02/store-front             |
+| Store-Admin       | https://github.com/sain02/store-admin-L9        | https://hub.docker.com/r/saizalsaini02/store-admin           |
+| Product-Service   | https://github.com/sain02/product-service-L9       | https://hub.docker.com/r/saizalsaini02/product-service       |
+| Order-Service     | https://github.com/sain02/order-service-L9        | https://hub.docker.com/r/saizalsaini02/order-service         |
+| Makeline-Service  | https://github.com/sain02/makeline-service-L9       | https://hub.docker.com/r/saizalsaini02/makeline-service       |
 
 
 ---
